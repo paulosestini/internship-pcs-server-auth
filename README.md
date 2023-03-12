@@ -1,6 +1,6 @@
-# internship-pcs-server-template
+# internship-pcs-server-auth
 
-Template for servers/services of the project *Internship 4.0* from Poli-USP.
+Authentication service of the project *Internship 4.0* from Poli-USP.
 
 ## Run Application
 
