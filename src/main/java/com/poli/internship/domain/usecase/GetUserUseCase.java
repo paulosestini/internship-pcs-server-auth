@@ -11,6 +11,6 @@ public class GetUserUseCase {
     private UserDataSource dataSource;
 
     public UserModel exec(String id) {
-        return this.dataSource.getUser(id);
+        return this.dataSource.getUserById(id);
     }
 }

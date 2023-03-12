@@ -3,6 +3,7 @@ package com.poli.internship.domain.models;
 public class UserModel {
     private String id;
     private String name;
+    private String email;
 
     public String getId() {
         return id;
@@ -18,5 +19,13 @@ public class UserModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

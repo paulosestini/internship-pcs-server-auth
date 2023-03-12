@@ -12,13 +12,23 @@ public class UserDataSource {
     @Autowired
     public UserRepository repository;
 
-    public UserModel getUser(String id) {
+    public UserModel getUserById(String id) {
         UserEntity userEntity = repository.findById(Long.parseLong(id));
+        if (userEntity == null) {
+            return null;
+        }
         return UserMapper.INSTANCE.userEntityToModel(userEntity);
     }
 
-    public UserModel createUser(String name, String password) {
-        UserEntity userEntity = repository.save(new UserEntity(name, password));
+    public UserModel getUserByEmail(String email) {
+        UserEntity userEntity = repository.findByEmail(email);
+        if (userEntity == null) {
+            return null;
+        }
+        return UserMapper.INSTANCE.userEntityToModel(userEntity);
+    }
+    public UserModel createUser(String name, String email) {
+        UserEntity userEntity = repository.save(new UserEntity(name, email));
         return UserMapper.INSTANCE.userEntityToModel(userEntity);
     }
 

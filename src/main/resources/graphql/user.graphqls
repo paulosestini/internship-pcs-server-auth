@@ -1,13 +1,18 @@
 type User {
     id: ID!
     name: String!
+    email: String!
 }
 
-input GetUserInput {
-    id: String!
+type Login {
+    token: String!
 }
 
 input CreateUserInput {
     name: String!
     password: String!
+}
+
+input LoginInput {
+    code: String!
 }
