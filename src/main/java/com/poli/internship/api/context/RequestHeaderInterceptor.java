@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poli.internship.api.error.CustomError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.server.WebGraphQlInterceptor;
@@ -20,8 +21,8 @@ import java.util.Map;
 
 @Component
 public class RequestHeaderInterceptor implements WebGraphQlInterceptor {
-    @Value("${auth.crypto-secret}")
-    private String authCryptoSecret;
+    @Autowired
+    private JWTService jwtService;
     @Override
     public Mono<WebGraphQlResponse> intercept (WebGraphQlRequest request, Chain chain) {
         Map<String, Object> context = new HashMap<>();
@@ -29,7 +30,7 @@ public class RequestHeaderInterceptor implements WebGraphQlInterceptor {
 
         DecodedJWT decodedToken = null;
         if (auth != null) {
-            decodedToken = this.decodeAuthorizationToken(auth);
+            decodedToken = this.jwtService.decodeAuthorizationToken(auth);
         }
 
         if (decodedToken != null) {
@@ -43,16 +44,4 @@ public class RequestHeaderInterceptor implements WebGraphQlInterceptor {
         return chain.next(request);
     }
 
-    private DecodedJWT decodeAuthorizationToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(this.authCryptoSecret);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .build();
-            DecodedJWT decodedJWT = verifier.verify(token);
-            return decodedJWT;
-        } catch (Exception e){
-            return null;
-        }
-
-    }
 }

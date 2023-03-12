@@ -3,9 +3,11 @@ package com.poli.internship.domain.usecase;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poli.internship.api.context.JWTService;
 import com.poli.internship.api.error.CustomError;
 import com.poli.internship.data.datasource.UserDataSource;
 import com.poli.internship.data.http.GoogleOAuthClient;
+import com.poli.internship.domain.models.AuthTokenPayload;
 import com.poli.internship.domain.models.GoogleOAuthModel;
 import com.poli.internship.domain.models.LoginModel;
 import com.poli.internship.domain.models.UserModel;
@@ -25,14 +27,15 @@ public class LoginUseCase {
     private GoogleOAuthClient oauthClient;
     @Autowired
     private UserDataSource userDataSource;
-    @Value("${auth.crypto-secret}")
-    private String authCryptoSecret;
+    @Autowired
+    private JWTService jwtService;
+
     public LoginModel exec(String code){
         GoogleOAuthModel loginInfo = this.oauthClient.authenticateUser(code);
         try {
             String oauthIdToken = loginInfo.getIdToken();
             String userInfoDecoded = new String(Base64.getDecoder().decode(oauthIdToken.split("\\.")[1]));
-            Map userInfo = new ObjectMapper().readValue(userInfoDecoded, HashMap.class);
+            HashMap<String, Object> userInfo = new ObjectMapper().readValue(userInfoDecoded, HashMap.class);
             UserModel user = this.userDataSource.getUserByEmail((String) userInfo.get("email"));
             if (user == null) {
                 user = this.userDataSource.createUser(
@@ -41,12 +44,8 @@ public class LoginUseCase {
                 );
             }
 
-            Algorithm algorithm = Algorithm.HMAC256(this.authCryptoSecret);
-            String token = JWT.create()
-                    .withClaim("userId", user.getId())
-                    .withClaim("email", (String) userInfo.get("email"))
-                    .withExpiresAt(Instant.now().plusSeconds(loginInfo.getExpiresIn()))
-                    .sign(algorithm);
+            AuthTokenPayload authTokenPayload = new AuthTokenPayload(user.getId(), (String) userInfo.get("email"), loginInfo.getExpiresIn());
+            String token = this.jwtService.createAuthorizationToken(authTokenPayload);
 
             LoginModel loginModel = new LoginModel();
             loginModel.setToken(token);
