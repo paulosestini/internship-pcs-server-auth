@@ -10,8 +10,8 @@
 	<groupId>com.poli</groupId>
 	<artifactId>internship</artifactId>
 	<version>0.0.3-SNAPSHOT</version>
-	<name>internship_4_0</name>
-	<description>Demo project for Spring Boot</description>
+	<name>internship_4_0_auth</name>
+	<description>Internship 4.0 Authentication service</description>
 	<properties>
 		<java.version>19</java.version>
 		<org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
@@ -55,6 +55,17 @@
 			<artifactId>postgres-socket-factory</artifactId>
 			<version>1.9.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webflux</artifactId>
+			<version>6.0.6</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
@@ -76,8 +87,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>19</source>
+					<target>19</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>
