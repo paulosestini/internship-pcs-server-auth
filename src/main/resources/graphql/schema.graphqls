@@ -3,5 +3,5 @@ type Query {
 }
 
 type Mutation {
-    login(input: LoginInput): Login
+    login(input: LoginInput!): Login
 }
