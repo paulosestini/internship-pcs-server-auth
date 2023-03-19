@@ -36,6 +36,7 @@ public class RequestHeaderInterceptor implements WebGraphQlInterceptor {
         if (decodedToken != null) {
             context.put("userId", decodedToken.getClaim("userId").asString());
             context.put("email", decodedToken.getClaim("email").asString());
+            context.put("userType", decodedToken.getClaim("userType").asString());
         }
 
         request.configureExecutionInput(((executionInput, builder) ->
