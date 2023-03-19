@@ -5,10 +5,8 @@ import com.poli.internship.api.context.JWTService;
 import com.poli.internship.data.entity.UserEntity;
 import com.poli.internship.data.http.GoogleOAuthClient;
 import com.poli.internship.data.repository.UserRepository;
-import com.poli.internship.domain.models.AuthTokenPayload;
-import com.poli.internship.domain.models.GoogleOAuthModel;
-import com.poli.internship.domain.models.LoginModel;
-import com.poli.internship.domain.models.UserModel;
+import com.poli.internship.domain.models.*;
+
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,21 +49,22 @@ public class UserTest {
 
     @Test
     public void getUser() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com"));
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
         AuthTokenPayload tokenPayload = new AuthTokenPayload(userEntity.getId().toString(), userEntity.getEmail(), 3600);
         String authToken = this.jwtService.createAuthorizationToken(tokenPayload);
 
         HttpGraphQlTester testerWithAuth = this.tester.mutate().header("Authorization", authToken).build();
-        UserModel user = testerWithAuth.documentName("getUser")
+        UserModel.User user = testerWithAuth.documentName("getUser")
                 .execute()
                 .path("getUser")
-                .entity(UserModel.class)
+                .entity(UserModel.User.class)
                 .get();
 
-        assertThat(user.getId()).isEqualTo(userEntity.getId().toString());
-        assertThat(user.getName()).isEqualTo(userEntity.getName());
-        assertThat(user.getEmail()).isEqualTo(userEntity.getEmail());
-        assertThat(user).hasOnlyFields("id", "name", "email");
+        assertThat(user.id()).isEqualTo(userEntity.getId().toString());
+        assertThat(user.name()).isEqualTo(userEntity.getName());
+        assertThat(user.email()).isEqualTo(userEntity.getEmail());
+        assertThat(user.userType()).isEqualTo(userEntity.getUserType());
+        assertThat(user).hasOnlyFields("id", "name", "email", "userType");
     }
 
     @Test
@@ -78,7 +77,7 @@ public class UserTest {
     }
 
     @Test public void loginWhenUserExists() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com"));
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
         String code = "my-oauth-code-1234";
         String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\"}";
         String idToken = "firstPart." + Base64.getEncoder().encodeToString(userIdTokenInfo.getBytes(StandardCharsets.UTF_8)) + ".thirdPart";
@@ -89,6 +88,8 @@ public class UserTest {
         Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
+        input.put("userType", "STUDENT");
+
 
         LoginModel login = this.tester.documentName("login")
                 .variable("input", input)
@@ -114,6 +115,7 @@ public class UserTest {
         Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
+        input.put("userType", "STUDENT");
 
         LoginModel login = this.tester.documentName("login")
                 .variable("input", input)

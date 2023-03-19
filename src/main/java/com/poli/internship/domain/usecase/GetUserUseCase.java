@@ -10,7 +10,7 @@ public class GetUserUseCase {
     @Autowired
     private UserDataSource dataSource;
 
-    public UserModel exec(String id) {
+    public UserModel.User exec(String id) {
         return this.dataSource.getUserById(id);
     }
 }
