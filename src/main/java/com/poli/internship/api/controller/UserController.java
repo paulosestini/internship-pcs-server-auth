@@ -2,7 +2,7 @@ package com.poli.internship.api.controller;
 
 import com.poli.internship.api.auth.GraphQLAuthorization;
 import com.poli.internship.domain.models.LoginModel;
-import com.poli.internship.domain.models.UserModel;
+import static com.poli.internship.domain.models.UserModel.User;
 import com.poli.internship.domain.models.UserType;
 import com.poli.internship.domain.usecase.GetUserUseCase;
 import com.poli.internship.domain.usecase.LoginUseCase;
@@ -23,7 +23,7 @@ public class UserController {
     public LoginUseCase loginUseCase;
 
     @QueryMapping
-    public UserModel.User getUser(GraphQLContext ctx) {
+    public User getUser(GraphQLContext ctx) {
         GraphQLAuthorization.checkAuthorization(ctx);
         return this.getUserUseCase.exec(ctx.get("userId"));
     }

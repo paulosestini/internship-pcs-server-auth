@@ -6,7 +6,7 @@ import com.poli.internship.data.entity.UserEntity;
 import com.poli.internship.data.mapper.UserMapper;
 import com.poli.internship.data.messaging.PubsubOutboundGateway;
 import com.poli.internship.data.repository.UserRepository;
-import com.poli.internship.domain.models.UserModel;
+import static com.poli.internship.domain.models.UserModel.User;
 import com.poli.internship.domain.models.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.execution.ErrorType;
@@ -19,7 +19,7 @@ public class UserDataSource {
     @Autowired
     private PubsubOutboundGateway messagingGateway;
 
-    public UserModel.User getUserById(String id) {
+    public User getUserById(String id) {
         UserEntity userEntity = repository.findById(Long.parseLong(id));
         if (userEntity == null) {
             return null;
@@ -27,14 +27,14 @@ public class UserDataSource {
         return UserMapper.INSTANCE.userEntityToModel(userEntity);
     }
 
-    public UserModel.User getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         UserEntity userEntity = repository.findByEmail(email);
         if (userEntity == null) {
             return null;
         }
         return UserMapper.INSTANCE.userEntityToModel(userEntity);
     }
-    public UserModel.User createUser(String name, String email, UserType userType) {
+    public User createUser(String name, String email, UserType userType) {
         UserEntity userEntity = repository.save(new UserEntity(name, email, userType));
 
         try {

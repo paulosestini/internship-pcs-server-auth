@@ -5,10 +5,15 @@ import com.poli.internship.api.context.JWTService;
 import com.poli.internship.data.entity.UserEntity;
 import com.poli.internship.data.http.GoogleOAuthClient;
 import com.poli.internship.data.repository.UserRepository;
-import com.poli.internship.domain.models.*;
 
 import static org.assertj.core.api.Assertions.*;
 
+import static com.poli.internship.domain.models.AuthTokenPayloadModel.AuthTokenPayload;
+import static com.poli.internship.domain.models.UserModel.User;
+
+import com.poli.internship.domain.models.GoogleOAuthModel;
+import com.poli.internship.domain.models.LoginModel;
+import com.poli.internship.domain.models.UserType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -50,7 +55,7 @@ public class UserTest {
     @Test
     public void getUser() {
         UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
-        AuthTokenPayloadModel.AuthTokenPayload tokenPayload = new AuthTokenPayloadModel.AuthTokenPayload(
+        AuthTokenPayload tokenPayload = new AuthTokenPayload(
                 userEntity.getId().toString(),
                 userEntity.getEmail(),
                 userEntity.getUserType(),
@@ -58,10 +63,10 @@ public class UserTest {
         String authToken = this.jwtService.createAuthorizationToken(tokenPayload);
 
         HttpGraphQlTester testerWithAuth = this.tester.mutate().header("Authorization", authToken).build();
-        UserModel.User user = testerWithAuth.documentName("getUser")
+        User user = testerWithAuth.documentName("getUser")
                 .execute()
                 .path("getUser")
-                .entity(UserModel.User.class)
+                .entity(User.class)
                 .get();
 
         assertThat(user.id()).isEqualTo(userEntity.getId().toString());

@@ -5,7 +5,11 @@ import com.poli.internship.api.context.JWTService;
 import com.poli.internship.api.error.CustomError;
 import com.poli.internship.data.datasource.UserDataSource;
 import com.poli.internship.data.http.GoogleOAuthClient;
-import com.poli.internship.domain.models.*;
+import com.poli.internship.domain.models.GoogleOAuthModel;
+import com.poli.internship.domain.models.LoginModel;
+import com.poli.internship.domain.models.UserType;
+import static com.poli.internship.domain.models.UserModel.User;
+import static com.poli.internship.domain.models.AuthTokenPayloadModel.AuthTokenPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Service;
@@ -28,7 +32,7 @@ public class LoginUseCase {
             String oauthIdToken = loginInfo.getIdToken();
             String userInfoDecoded = new String(Base64.getDecoder().decode(oauthIdToken.split("\\.")[1]));
             HashMap<String, Object> userInfo = new ObjectMapper().readValue(userInfoDecoded, HashMap.class);
-            UserModel.User user = this.userDataSource.getUserByEmail((String) userInfo.get("email"));
+            User user = this.userDataSource.getUserByEmail((String) userInfo.get("email"));
 
             if (user == null) {
                 user = this.userDataSource.createUser(
@@ -42,7 +46,7 @@ public class LoginUseCase {
                 throw new CustomError("Invalid user type.", ErrorType.BAD_REQUEST);
             }
 
-            AuthTokenPayloadModel.AuthTokenPayload authTokenPayload = new AuthTokenPayloadModel.AuthTokenPayload(
+            AuthTokenPayload authTokenPayload = new AuthTokenPayload(
                     user.id(),
                     (String) userInfo.get("email"),
                     user.userType(),
