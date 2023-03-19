@@ -42,7 +42,11 @@ public class LoginUseCase {
                 throw new CustomError("Invalid user type.", ErrorType.BAD_REQUEST);
             }
 
-            AuthTokenPayload authTokenPayload = new AuthTokenPayload(user.id(), (String) userInfo.get("email"), loginInfo.getExpiresIn());
+            AuthTokenPayloadModel.AuthTokenPayload authTokenPayload = new AuthTokenPayloadModel.AuthTokenPayload(
+                    user.id(),
+                    (String) userInfo.get("email"),
+                    user.userType(),
+                    loginInfo.getExpiresIn());
             String token = this.jwtService.createAuthorizationToken(authTokenPayload);
 
             LoginModel loginModel = new LoginModel();

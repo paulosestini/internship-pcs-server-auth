@@ -50,7 +50,11 @@ public class UserTest {
     @Test
     public void getUser() {
         UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
-        AuthTokenPayload tokenPayload = new AuthTokenPayload(userEntity.getId().toString(), userEntity.getEmail(), 3600);
+        AuthTokenPayloadModel.AuthTokenPayload tokenPayload = new AuthTokenPayloadModel.AuthTokenPayload(
+                userEntity.getId().toString(),
+                userEntity.getEmail(),
+                userEntity.getUserType(),
+                3600);
         String authToken = this.jwtService.createAuthorizationToken(tokenPayload);
 
         HttpGraphQlTester testerWithAuth = this.tester.mutate().header("Authorization", authToken).build();
@@ -101,6 +105,7 @@ public class UserTest {
         DecodedJWT jwt = this.jwtService.decodeAuthorizationToken(login.getToken());
         assertThat(jwt.getClaim("userId").asString()).isEqualTo(userEntity.getId().toString());
         assertThat(jwt.getClaim("email").asString()).isEqualTo(userEntity.getEmail());
+        assertThat(jwt.getClaim("userType").asString()).isEqualTo(userEntity.getUserType().toString());
         assertThat(jwt.getExpiresAtAsInstant()).isCloseTo(Instant.now().plusSeconds(3600), within(5, ChronoUnit.SECONDS));
     }
 
@@ -128,6 +133,7 @@ public class UserTest {
         DecodedJWT jwt = this.jwtService.decodeAuthorizationToken(login.getToken());
         assertThat(jwt.getClaim("userId").asString()).isEqualTo(user.getId().toString());
         assertThat(jwt.getClaim("email").asString()).isEqualTo(user.getEmail());
+        assertThat(jwt.getClaim("userType").asString()).isEqualTo(user.getUserType().toString());
         assertThat(jwt.getExpiresAtAsInstant()).isCloseTo(Instant.now().plusSeconds(3600), within(5, ChronoUnit.SECONDS));
     }
 }
