@@ -38,6 +38,7 @@ services:
     container_name: app
     depends_on:
       - db
+      - pub_sub_emulator
     build: .
     restart: on-failure
     ports:
@@ -51,6 +52,17 @@ services:
     networks:
       - app-network
     profiles: ["default"]
+  pub_sub_emulator:
+   container_name: pub_sub_emulator
+   image: thekevjames/gcloud-pubsub-emulator:422.0.0
+   restart: always
+   ports:
+     - 8681:8681
+   environment:
+    - PUBSUB_PROJECT1=PROJECT_TEST_ID,user-creation:user-creation-sub,testSubscription:testSubscription-sub
+   expose:
+    - 8681
+   profiles: ["default", "test"]
 
 volumes:
   db-test-data:

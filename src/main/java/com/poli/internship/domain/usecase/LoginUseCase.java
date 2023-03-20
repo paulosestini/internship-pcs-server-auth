@@ -1,7 +1,5 @@
 package com.poli.internship.domain.usecase;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poli.internship.api.context.JWTService;
 import com.poli.internship.api.error.CustomError;
@@ -12,14 +10,11 @@ import com.poli.internship.domain.models.GoogleOAuthModel;
 import com.poli.internship.domain.models.LoginModel;
 import com.poli.internship.domain.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class LoginUseCase {
