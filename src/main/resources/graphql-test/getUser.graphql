@@ -3,5 +3,6 @@ query getUser {
         id
         name
         email
+        userType
     }
 }

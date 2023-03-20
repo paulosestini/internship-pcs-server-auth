@@ -1,5 +1,6 @@
 package com.poli.internship.data.entity;
 
+import com.poli.internship.domain.models.UserType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,12 +13,14 @@ public class UserEntity {
     private Long id;
     private String name;
     private String email;
+    private UserType userType;
 
     protected UserEntity() {}
 
-    public UserEntity(String name, String email) {
+    public UserEntity(String name, String email, UserType userType) {
         this.name = name;
         this.email = email;
+        this.userType = userType;
     }
 
     public Long getId() {
@@ -42,5 +45,13 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }

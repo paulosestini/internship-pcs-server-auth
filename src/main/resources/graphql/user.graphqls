@@ -2,17 +2,20 @@ type User {
     id: ID!
     name: String!
     email: String!
+    userType: UserType!
 }
 
 type Login {
     token: String!
 }
 
-input CreateUserInput {
-    name: String!
-    password: String!
+enum UserType {
+    STUDENT
+    COMPANY
+    PROFESSOR
 }
 
 input LoginInput {
     code: String!
+    userType: UserType!
 }

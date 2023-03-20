@@ -5,12 +5,15 @@ import com.poli.internship.api.context.JWTService;
 import com.poli.internship.data.entity.UserEntity;
 import com.poli.internship.data.http.GoogleOAuthClient;
 import com.poli.internship.data.repository.UserRepository;
-import com.poli.internship.domain.models.AuthTokenPayload;
-import com.poli.internship.domain.models.GoogleOAuthModel;
-import com.poli.internship.domain.models.LoginModel;
-import com.poli.internship.domain.models.UserModel;
+
 import static org.assertj.core.api.Assertions.*;
 
+import static com.poli.internship.domain.models.AuthTokenPayloadModel.AuthTokenPayload;
+import static com.poli.internship.domain.models.UserModel.User;
+
+import com.poli.internship.domain.models.GoogleOAuthModel;
+import com.poli.internship.domain.models.LoginModel;
+import com.poli.internship.domain.models.UserType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -51,21 +54,26 @@ public class UserTest {
 
     @Test
     public void getUser() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com"));
-        AuthTokenPayload tokenPayload = new AuthTokenPayload(userEntity.getId().toString(), userEntity.getEmail(), 3600);
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
+        AuthTokenPayload tokenPayload = new AuthTokenPayload(
+                userEntity.getId().toString(),
+                userEntity.getEmail(),
+                userEntity.getUserType(),
+                3600);
         String authToken = this.jwtService.createAuthorizationToken(tokenPayload);
 
         HttpGraphQlTester testerWithAuth = this.tester.mutate().header("Authorization", authToken).build();
-        UserModel user = testerWithAuth.documentName("getUser")
+        User user = testerWithAuth.documentName("getUser")
                 .execute()
                 .path("getUser")
-                .entity(UserModel.class)
+                .entity(User.class)
                 .get();
 
-        assertThat(user.getId()).isEqualTo(userEntity.getId().toString());
-        assertThat(user.getName()).isEqualTo(userEntity.getName());
-        assertThat(user.getEmail()).isEqualTo(userEntity.getEmail());
-        assertThat(user).hasOnlyFields("id", "name", "email");
+        assertThat(user.id()).isEqualTo(userEntity.getId().toString());
+        assertThat(user.name()).isEqualTo(userEntity.getName());
+        assertThat(user.email()).isEqualTo(userEntity.getEmail());
+        assertThat(user.userType()).isEqualTo(userEntity.getUserType());
+        assertThat(user).hasOnlyFields("id", "name", "email", "userType");
     }
 
     @Test
@@ -78,7 +86,7 @@ public class UserTest {
     }
 
     @Test public void loginWhenUserExists() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com"));
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
         String code = "my-oauth-code-1234";
         String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\"}";
         String idToken = "firstPart." + Base64.getEncoder().encodeToString(userIdTokenInfo.getBytes(StandardCharsets.UTF_8)) + ".thirdPart";
@@ -89,6 +97,8 @@ public class UserTest {
         Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
+        input.put("userType", "STUDENT");
+
 
         LoginModel login = this.tester.documentName("login")
                 .variable("input", input)
@@ -100,6 +110,7 @@ public class UserTest {
         DecodedJWT jwt = this.jwtService.decodeAuthorizationToken(login.getToken());
         assertThat(jwt.getClaim("userId").asString()).isEqualTo(userEntity.getId().toString());
         assertThat(jwt.getClaim("email").asString()).isEqualTo(userEntity.getEmail());
+        assertThat(jwt.getClaim("userType").asString()).isEqualTo(userEntity.getUserType().toString());
         assertThat(jwt.getExpiresAtAsInstant()).isCloseTo(Instant.now().plusSeconds(3600), within(5, ChronoUnit.SECONDS));
     }
 
@@ -114,6 +125,7 @@ public class UserTest {
         Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
+        input.put("userType", "STUDENT");
 
         LoginModel login = this.tester.documentName("login")
                 .variable("input", input)
@@ -126,6 +138,7 @@ public class UserTest {
         DecodedJWT jwt = this.jwtService.decodeAuthorizationToken(login.getToken());
         assertThat(jwt.getClaim("userId").asString()).isEqualTo(user.getId().toString());
         assertThat(jwt.getClaim("email").asString()).isEqualTo(user.getEmail());
+        assertThat(jwt.getClaim("userType").asString()).isEqualTo(user.getUserType().toString());
         assertThat(jwt.getExpiresAtAsInstant()).isCloseTo(Instant.now().plusSeconds(3600), within(5, ChronoUnit.SECONDS));
     }
 }
