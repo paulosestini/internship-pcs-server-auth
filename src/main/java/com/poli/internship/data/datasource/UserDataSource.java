@@ -6,6 +6,8 @@ import com.poli.internship.data.entity.UserEntity;
 import com.poli.internship.data.mapper.UserMapper;
 import com.poli.internship.data.messaging.PubsubOutboundGateway;
 import com.poli.internship.data.repository.UserRepository;
+
+import static com.poli.internship.InternshipApplication.LOGGER;
 import static com.poli.internship.domain.models.UserModel.User;
 import com.poli.internship.domain.models.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,7 @@ public class UserDataSource {
             String message = (new ObjectMapper()).writeValueAsString(userEntity);
             messagingGateway.sendToPubsub(message);
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             repository.delete(userEntity);
             throw new CustomError("User creation failed.", ErrorType.INTERNAL_ERROR);
         }

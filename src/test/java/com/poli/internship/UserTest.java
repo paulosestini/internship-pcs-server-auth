@@ -94,7 +94,7 @@ public class UserTest {
         mockGoogleOAuthModel.setAccessToken("access-token");
         mockGoogleOAuthModel.setIdToken(idToken);
         mockGoogleOAuthModel.setExpiresIn(3600);
-        Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
+        Mockito.when(mockGoogleOAuthClient.authenticateUser(code, null)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
         input.put("userType", "STUDENT");
@@ -122,7 +122,7 @@ public class UserTest {
         mockGoogleOAuthModel.setAccessToken("access-token");
         mockGoogleOAuthModel.setIdToken(idToken);
         mockGoogleOAuthModel.setExpiresIn(3600);
-        Mockito.when(mockGoogleOAuthClient.authenticateUser(code)).thenReturn(mockGoogleOAuthModel);
+        Mockito.when(mockGoogleOAuthClient.authenticateUser(code, null)).thenReturn(mockGoogleOAuthModel);
         Map<String, Object> input = new HashMap<String, Object>();
         input.put("code", code);
         input.put("userType", "STUDENT");
