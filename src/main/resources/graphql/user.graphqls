@@ -18,4 +18,5 @@ enum UserType {
 input LoginInput {
     code: String!
     userType: UserType!
+    redirectUri: String
 }
