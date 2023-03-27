@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.poli.internship.InternshipApplication.LOGGER;
+
 @Service
 public class GoogleOAuthClient {
     private HttpClient httpClient;
@@ -30,19 +32,21 @@ public class GoogleOAuthClient {
     @Value("${oauth.client-id}")
     private String clientId;
     @Value("${oauth.redirect-uri}")
-    private String redirectUri;
+    private String defaultRedirectUri;
 
     @Autowired
     private Environment env;
     public GoogleOAuthClient() {
         this.httpClient = HttpClient.newHttpClient();
     }
-    public GoogleOAuthModel authenticateUser(String code) {
+    public GoogleOAuthModel authenticateUser(String code, String redirectUri) {
+        redirectUri = redirectUri == null ? this.defaultRedirectUri : redirectUri;
+
         Map<String, String> parameters = new HashMap<>();
         parameters.put("code", code);
         parameters.put("client_id", this.clientId);
         parameters.put("client_secret", this.clientSecret);
-        parameters.put("redirect_uri", this.redirectUri);
+        parameters.put("redirect_uri", redirectUri);
         parameters.put("grant_type", "authorization_code");
 
         String form = parameters.entrySet()
@@ -56,9 +60,11 @@ public class GoogleOAuthClient {
                 .POST(HttpRequest.BodyPublishers.ofString(form))
                 .build();
 
+        HttpResponse<String> response;
+        Map map = null;
         try {
-            HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            Map map = new ObjectMapper().readValue(response.body(), HashMap.class);
+            response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            map = new ObjectMapper().readValue(response.body(), HashMap.class);
 
             GoogleOAuthModel loginInfo = new GoogleOAuthModel();
             loginInfo.setAccessToken((String) map.get("access_token"));
@@ -66,6 +72,10 @@ public class GoogleOAuthClient {
             loginInfo.setExpiresIn((int) map.get("expires_in"));
             return loginInfo;
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            if((map != null) && map.get("error") != null) {
+                LOGGER.error("OAuth error: " + (String) map.get("error") + " | error_description: " + (String) map.get("error_description"));
+            }
             throw new CustomError("Could not login at Google OAuth.", ErrorType.INTERNAL_ERROR);
         }
     }

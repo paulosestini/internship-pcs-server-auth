@@ -9,6 +9,6 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME:$BRANCH_NAME']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
-  args: ['run', 'deploy', 'template-internship-service', '--image', 'gcr.io/$PROJECT_ID/$REPO_NAME:$BRANCH_NAME', '--region', 'us-central1']
+  args: ['run', 'deploy', 'auth-internship-service', '--image', 'gcr.io/$PROJECT_ID/$REPO_NAME:$BRANCH_NAME', '--region', 'us-central1']
 images:
   - gcr.io/$PROJECT_ID/$REPO_NAME:$BRANCH_NAME

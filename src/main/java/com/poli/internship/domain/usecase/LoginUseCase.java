@@ -6,8 +6,10 @@ import com.poli.internship.api.error.CustomError;
 import com.poli.internship.data.datasource.UserDataSource;
 import com.poli.internship.data.http.GoogleOAuthClient;
 import com.poli.internship.domain.models.GoogleOAuthModel;
+
+import static com.poli.internship.InternshipApplication.LOGGER;
+import static com.poli.internship.domain.models.LoginInputModel.LoginInput;
 import com.poli.internship.domain.models.LoginModel;
-import com.poli.internship.domain.models.UserType;
 import static com.poli.internship.domain.models.UserModel.User;
 import static com.poli.internship.domain.models.AuthTokenPayloadModel.AuthTokenPayload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +28,8 @@ public class LoginUseCase {
     @Autowired
     private JWTService jwtService;
 
-    public LoginModel exec(String code, UserType userType){
-        GoogleOAuthModel loginInfo = this.oauthClient.authenticateUser(code);
+    public LoginModel exec(LoginInput input){
+        GoogleOAuthModel loginInfo = this.oauthClient.authenticateUser(input.code(), input.redirectUri());
         try {
             String oauthIdToken = loginInfo.getIdToken();
             String userInfoDecoded = new String(Base64.getDecoder().decode(oauthIdToken.split("\\.")[1]));
@@ -38,11 +40,11 @@ public class LoginUseCase {
                 user = this.userDataSource.createUser(
                         (String) userInfo.get("name"),
                         (String) userInfo.get("email"),
-                        userType
+                        input.userType()
                 );
             }
 
-            if(user.userType() != userType) {
+            if(user.userType() != input.userType()) {
                 throw new CustomError("Invalid user type.", ErrorType.BAD_REQUEST);
             }
 
@@ -58,7 +60,8 @@ public class LoginUseCase {
             return loginModel;
         } catch (CustomError error) {
             throw error;
-        } catch (Exception exception){
+        } catch (Exception e){
+            LOGGER.error(e.getMessage(), e);
             throw new CustomError("Couldn't generate JWT token", ErrorType.INTERNAL_ERROR);
         }
     }

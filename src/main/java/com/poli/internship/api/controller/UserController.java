@@ -1,6 +1,7 @@
 package com.poli.internship.api.controller;
 
 import com.poli.internship.api.auth.GraphQLAuthorization;
+import static com.poli.internship.domain.models.LoginInputModel.LoginInput;
 import com.poli.internship.domain.models.LoginModel;
 import static com.poli.internship.domain.models.UserModel.User;
 import com.poli.internship.domain.models.UserType;
@@ -32,6 +33,12 @@ public class UserController {
     @MutationMapping
     public LoginModel login(@Argument Map input) {
         Map data = (Map) input.get("input");
-        return this.loginUseCase.exec((String) data.get("code"), UserType.valueOf((String) data.get("userType")));
+        return this.loginUseCase.exec(
+                new LoginInput(
+                    (String) data.get("code"),
+                    UserType.valueOf((String) data.get("userType")),
+                    (String) data.get("redirectUri")
+                )
+        );
     }
 }
