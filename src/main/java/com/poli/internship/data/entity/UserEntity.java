@@ -1,10 +1,7 @@
 package com.poli.internship.data.entity;
 
 import com.poli.internship.domain.models.UserType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class UserEntity {
@@ -12,15 +9,18 @@ public class UserEntity {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
+    @Column(unique = true)
     private String email;
     private UserType userType;
+    private String profilePictureUrl;
 
     protected UserEntity() {}
 
-    public UserEntity(String name, String email, UserType userType) {
+    public UserEntity(String name, String email, UserType userType, String profilePictureUrl) {
         this.name = name;
         this.email = email;
         this.userType = userType;
+        this.profilePictureUrl = profilePictureUrl;
     }
 
     public Long getId() {
@@ -54,4 +54,8 @@ public class UserEntity {
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
+
+    public String getProfilePictureUrl() { return profilePictureUrl; }
+
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 }

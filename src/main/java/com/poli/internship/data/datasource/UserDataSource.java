@@ -9,6 +9,7 @@ import com.poli.internship.data.repository.UserRepository;
 
 import static com.poli.internship.InternshipApplication.LOGGER;
 import static com.poli.internship.domain.models.UserModel.User;
+import static com.poli.internship.domain.models.CreateUserInputModel.CreateUserInput;
 import com.poli.internship.domain.models.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.execution.ErrorType;
@@ -36,8 +37,15 @@ public class UserDataSource {
         }
         return UserMapper.INSTANCE.userEntityToModel(userEntity);
     }
-    public User createUser(String name, String email, UserType userType) {
-        UserEntity userEntity = repository.save(new UserEntity(name, email, userType));
+    public User createUser(CreateUserInput input) {
+        UserEntity userEntity = repository.save(
+                new UserEntity(
+                        input.name(),
+                        input.email(),
+                        input.userType(),
+                        input.profilePictureUrl()
+                )
+        );
 
         try {
             String message = (new ObjectMapper()).writeValueAsString(userEntity);
