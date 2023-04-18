@@ -4,5 +4,6 @@ query getUser {
         name
         email
         userType
+        profilePictureUrl
     }
 }

@@ -54,7 +54,7 @@ public class UserTest {
 
     @Test
     public void getUser() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT, "some_url"));
         AuthTokenPayload tokenPayload = new AuthTokenPayload(
                 userEntity.getId().toString(),
                 userEntity.getEmail(),
@@ -73,7 +73,8 @@ public class UserTest {
         assertThat(user.name()).isEqualTo(userEntity.getName());
         assertThat(user.email()).isEqualTo(userEntity.getEmail());
         assertThat(user.userType()).isEqualTo(userEntity.getUserType());
-        assertThat(user).hasOnlyFields("id", "name", "email", "userType");
+        assertThat(user.profilePictureUrl()).isEqualTo(userEntity.getProfilePictureUrl());
+        assertThat(user).hasOnlyFields("id", "name", "email", "userType", "profilePictureUrl");
     }
 
     @Test
@@ -86,9 +87,9 @@ public class UserTest {
     }
 
     @Test public void loginWhenUserExists() {
-        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT));
+        UserEntity userEntity = this.repository.save(new UserEntity("Paulo", "paulo@teste.com", UserType.STUDENT, "some_url"));
         String code = "my-oauth-code-1234";
-        String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\"}";
+        String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\", \"profile\":\"some_url\"}";
         String idToken = "firstPart." + Base64.getEncoder().encodeToString(userIdTokenInfo.getBytes(StandardCharsets.UTF_8)) + ".thirdPart";
         GoogleOAuthModel mockGoogleOAuthModel = new GoogleOAuthModel();
         mockGoogleOAuthModel.setAccessToken("access-token");
@@ -116,7 +117,7 @@ public class UserTest {
 
     @Test public void loginWhenUserDoesntExist() {
         String code = "my-oauth-code-1234";
-        String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\"}";
+        String userIdTokenInfo = "{\"name\": \"Paulo\", \"email\": \"paulo@teste.com\", \"profile\":\"some_url\"}";
         String idToken = "firstPart." + Base64.getEncoder().encodeToString(userIdTokenInfo.getBytes(StandardCharsets.UTF_8)) + ".thirdPart";
         GoogleOAuthModel mockGoogleOAuthModel = new GoogleOAuthModel();
         mockGoogleOAuthModel.setAccessToken("access-token");

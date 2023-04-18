@@ -26,6 +26,7 @@ public class JWTService {
                 .withExpiresAt(Instant.now().plusSeconds(tokenPayload.expiresIn()))
                 .sign(algorithm);
     }
+
     public DecodedJWT decodeAuthorizationToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(this.authCryptoSecret);

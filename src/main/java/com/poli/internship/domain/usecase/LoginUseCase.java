@@ -5,6 +5,7 @@ import com.poli.internship.api.context.JWTService;
 import com.poli.internship.api.error.CustomError;
 import com.poli.internship.data.datasource.UserDataSource;
 import com.poli.internship.data.http.GoogleOAuthClient;
+import static com.poli.internship.domain.models.CreateUserInputModel.CreateUserInput;
 import com.poli.internship.domain.models.GoogleOAuthModel;
 
 import static com.poli.internship.InternshipApplication.LOGGER;
@@ -37,11 +38,13 @@ public class LoginUseCase {
             User user = this.userDataSource.getUserByEmail((String) userInfo.get("email"));
 
             if (user == null) {
-                user = this.userDataSource.createUser(
+                CreateUserInput createUserInput = new CreateUserInput(
                         (String) userInfo.get("name"),
                         (String) userInfo.get("email"),
-                        input.userType()
+                        input.userType(),
+                        (String) userInfo.get("picture")
                 );
+                user = this.userDataSource.createUser(createUserInput);
             }
 
             if(user.userType() != input.userType()) {
