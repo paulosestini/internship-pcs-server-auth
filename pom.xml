@@ -9,7 +9,11 @@
 	</parent>
 	<groupId>com.poli</groupId>
 	<artifactId>internship</artifactId>
+<<<<<<< HEAD
 	<version>0.0.6-SNAPSHOT</version>
+=======
+	<version>0.0.7-SNAPSHOT</version>
+>>>>>>> release/v0.0.7
 	<name>internship_4_0_auth</name>
 	<description>Internship 4.0 Authentication service</description>
 	<properties>
